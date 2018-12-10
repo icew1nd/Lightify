@@ -62,8 +62,23 @@ TeamBlueStack.navigationOptions = {
   ),
 };
 
+const tabBarOptions = {
+  labelStyle: {
+    fontSize: 12,
+  },
+  tabStyle: {
+    width: 100,
+  },
+  style: {
+    backgroundColor: '#35373a',
+  },
+}
+
+const TabNavigatorConfig = {tabBarOptions }
+
 export default createBottomTabNavigator({
   HomeStack,
   TeamRedStack,
   TeamBlueStack
-});
+}, TabNavigatorConfig
+);
