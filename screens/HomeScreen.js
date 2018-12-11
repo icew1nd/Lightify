@@ -34,7 +34,6 @@ export default class HomeScreen extends React.Component {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      console.log(responseJson)
       return responseJson;
     })
     .catch((error) => {
@@ -86,7 +85,6 @@ export default class HomeScreen extends React.Component {
       }else{
         this.setBlue();
       }
-      console.log('trying to call this!');
     }, 200);
 
     this.setState({intervalId: intervalId});
