@@ -78,7 +78,7 @@ const tabBarOptions = {
 const TabNavigatorConfig = {tabBarOptions }
 
 export default createBottomTabNavigator({
-  // HomeStack,
+  HomeStack,
   TeamRedStack,
   TeamBlueStack
 }, TabNavigatorConfig
