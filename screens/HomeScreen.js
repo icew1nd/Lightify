@@ -5,184 +5,192 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
+  TouchableOpacity
 } from 'react-native';
-import { WebBrowser } from 'expo';
-
-import { MonoText } from '../components/StyledText';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { intervalId: null };
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.intervalId);
+  }
+
+  changeLightState(parameters){
+    return fetch('http://192.168.8.100/api/ip-RXKvu2xwaFV1LI4FsNHFXfaJJOU-oehXhQlKN/lights/3/state', {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(parameters),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+
+  setNormal = () => {
+    clearInterval(this.state.intervalId);
+    this.changeLightState({
+      "on": true,
+      "bri": 254,
+      "hue": 8595,
+      "sat": 121,
+      "effect": "none",
+      "xy": [
+        0.4452,
+        0.4068
+      ],
+      "ct": 346,
+      "alert": "none",
+      "colormode": "ct",
+      "mode": "homeautomation",
+      "reachable": true
+    });
+  }
+
+  setRandom = () => {
+    clearInterval(this.state.intervalId);
+    this.changeLightState({
+      "on": true,
+      "bri": 254,
+      "sat": 254,
+      "effect": "none",
+      "ct": 153,
+      "alert": "none",
+      "colormode": "xy",
+      "mode": "homeautomation",
+      "reachable": true
+    });
+    var intervalId = setInterval(()=>{
+      const randomNumber = Math.floor(Math.random()*(4-1+1)+1);
+      if(randomNumber % 4==0){
+        this.setYellow();
+      }else if(randomNumber % 3==0){
+        this.setRed();
+      }else if(randomNumber % 2==0){
+        this.setGreen();
+      }else{
+        this.setBlue();
+      }
+      console.log('trying to call this!');
+    }, 200);
+
+    this.setState({intervalId: intervalId});
+  }
+  
+  setBlue = () => {
+    this.changeLightState({
+      "hue": 45904,
+      "xy": [
+        0.1541,
+        0.084
+      ],
+    });
+  }
+
+  setGreen = () => {
+    this.changeLightState({
+      "hue": 24432,
+      "xy": [
+        0.1938,
+        0.6821
+      ],
+    });
+  }
+
+  setYellow = () => {
+    this.changeLightState({
+      "hue": 24432,
+      "xy": [
+        0.4862,
+        0.4791
+      ],
+    });
+  }
+
+  setRed = () => {
+    this.changeLightState({
+      "hue": 63772,
+      "xy": [
+        0.64,
+        0.2833
+      ],
+    });
+  }
+
+  turnOff = () => {
+    clearInterval(this.state.intervalId);
+    this.changeLightState({"on": false})
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
-
           <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
-
             <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
+              Hey denne app del kan lave farver! :- )
             </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity onPress={this.setNormal} style={styles.button}><Text style={styles.buttonText}>Tænd</Text></TouchableOpacity>
+              <TouchableOpacity onPress={this.setRandom} style={styles.button}><Text style={styles.buttonText}>Regnbuer</Text></TouchableOpacity>
+              <TouchableOpacity onPress={this.turnOff} style={styles.button}><Text style={styles.buttonText}>Sluk</Text></TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
-        </View>
       </View>
     );
   }
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    paddingTop: 30,
+    backgroundColor: '#6d088e'
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+  buttonContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingTop: 20
+  },
+  button:{
+    paddingVertical:20,
+    paddingHorizontal:30,
+    backgroundColor:'#4a0660',
+    borderRadius:5,
+    margin: 5 
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#FFF',
+    lineHeight: 24
   },
   contentContainer: {
     paddingTop: 30,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
   },
   getStartedContainer: {
     alignItems: 'center',
     marginHorizontal: 50,
   },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
   getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
+    fontSize: 18,
+    color: '#FFF',
     lineHeight: 24,
     textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
+  }
 });
