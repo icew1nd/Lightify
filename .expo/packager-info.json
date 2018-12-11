@@ -2,8 +2,8 @@
   "expoServerPort": 19000,
   "expoServerNgrokUrl": "https://vm-rn3.anonymous.lightify.exp.direct",
   "packagerNgrokUrl": "https://packager.vm-rn3.anonymous.lightify.exp.direct",
-  "ngrokPid": 13329,
+  "ngrokPid": 14940,
   "devToolsPort": 19002,
   "packagerPort": 19003,
-  "packagerPid": 13308
+  "packagerPid": 14919
 }

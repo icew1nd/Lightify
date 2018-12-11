@@ -70,14 +70,15 @@ const tabBarOptions = {
     width: 100,
   },
   style: {
-    backgroundColor: '#35373a',
-  },
+    paddingTop: 10,
+    backgroundColor: '#35373a'
+  }
 }
 
 const TabNavigatorConfig = {tabBarOptions }
 
 export default createBottomTabNavigator({
-  HomeStack,
+  // HomeStack,
   TeamRedStack,
   TeamBlueStack
 }, TabNavigatorConfig
